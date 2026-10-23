@@ -6,7 +6,7 @@ function App() {
   const [status, setStatus] = useState("loading");
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/health")
+    fetch("https://backend-rho-one-80.vercel.app/api/health")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Backend request failed");
