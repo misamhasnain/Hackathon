@@ -1,58 +1,31 @@
+import { useState } from "react";
+import { useAuth } from "./context/AuthContext.jsx";
+import Layout, { NAV } from "./components/Layout.jsx";
+import Login from "./pages/Login.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Employees from "./pages/Employees.jsx";
+import Attendance from "./pages/Attendance.jsx";
+import Leaves from "./pages/Leaves.jsx";
+import Payroll from "./pages/Payroll.jsx";
+import Chat from "./pages/Chat.jsx";
+import ChangePassword from "./pages/ChangePassword.jsx";
 
-import { useEffect, useState } from "react";
+const PAGES = { dashboard: Dashboard, employees: Employees, attendance: Attendance, leaves: Leaves, payroll: Payroll, chat: Chat, password: ChangePassword };
 
-function App() {
-  const [message, setMessage] = useState("Connecting to backend...");
-  const [status, setStatus] = useState("loading");
+export default function App() {
+  const { user, ready } = useAuth();
+  const [page, setPage] = useState("dashboard");
 
-  useEffect(() => {
-    fetch("https://backend-rho-one-80.vercel.app/api/health")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Backend request failed");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setMessage(
-          data.status === "OK"
-            ? "Express Backend Connected!"
-            : "Unexpected response"
-        );
-        setStatus("success");
-      })
-      .catch(() => {
-        setMessage("Backend connect nahi ho raha");
-        setStatus("error");
-      });
-  }, []);
+  if (!ready) return <p className="p-10 text-center text-slate-500">Loading...</p>;
+  if (!user) return <Login />;
+
+  const allowed = NAV.filter((n) => n.roles.includes(user.role));
+  const current = allowed.some((n) => n.id === page) ? page : "dashboard";
+  const Page = PAGES[current];
 
   return (
-    <main style={{
-      fontFamily: "Arial, sans-serif",
-      minHeight: "100vh",
-      display: "grid",
-      placeItems: "center",
-      background: "#0b0e14",
-      color: "white",
-      textAlign: "center"
-    }}>
-      <div>
-        <h1>SMIT Hackathon Starter</h1>
-        <p>React + Express.js</p>
-        <h2 style={{
-          color: status === "success"
-            ? "#4ade80"
-            : status === "error"
-            ? "#f87171"
-            : "#facc15"
-        }}>
-          {message}
-        </h2>
-        <p>Full Stack Project Ready 🚀</p>
-      </div>
-    </main>
+    <Layout page={current} setPage={setPage} items={allowed}>
+      <Page go={setPage} />
+    </Layout>
   );
 }
-
-export default App;
