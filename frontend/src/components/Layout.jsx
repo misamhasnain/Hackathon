@@ -10,7 +10,7 @@ export const NAV = [
   { id: "leaves", label: "Leaves", icon: CalendarOff, roles: ALL },
   { id: "payroll", label: "Payroll", icon: Wallet, roles: ALL },
     { id: "password", label: "Change password", icon: KeyRound, roles: ALL },
-      { id: "password", label: "Change password", icon: KeyRound, roles: ALL },
+      
 ];
 
 export default function Layout({ page, setPage, items, children }) {

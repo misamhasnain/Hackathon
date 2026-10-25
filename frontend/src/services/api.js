@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || " import.meta.env.VITE_API_URL ...";
 export const TOKEN_KEY = "hcm_token";
 
 export async function apiRequest(endpoint, options = {}) {
