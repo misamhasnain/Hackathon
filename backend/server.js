@@ -18,20 +18,29 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// MongoDB connect (routes se PEHLE)
+let isConnected = false;
+app.use(async (req, res, next) => {
+  try {
+    if (!isConnected) {
+      await connectDB();
+      isConnected = true;
+    }
+    next();
+  } catch (error) {
+    console.error("DB connection failed:", error.message);
+    res.status(500).json({ success: false, message: "Database connection failed" });
+  }
+});
+
 // Home
 app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "SMIT Hackathon API is running!",
-  });
+  res.status(200).json({ success: true, message: "SMIT Hackathon API is running!" });
 });
 
 // Health check
 app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    status: "OK",
-  });
+  res.status(200).json({ success: true, status: "OK" });
 });
 
 app.use("/api/organizations", organizationRoutes);
@@ -42,18 +51,9 @@ app.use("/api/leaves", leaveRoutes);
 app.use("/api/payroll", payrollRoutes);
 app.use("/api/ai", aiRoutes);
 
-// Start only after MongoDB connects
-const startServer = async () => {
-  try {
-    await connectDB();
+// Local development only
+if (process.env.VERCEL !== "1") {
+  app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+}
 
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error("Server startup failed:", error.message);
-    process.exit(1);
-  }
-};
-
-startServer();
+export default app;
